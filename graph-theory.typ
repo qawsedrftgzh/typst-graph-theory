@@ -28,9 +28,15 @@
     if first == second {
         shift = -1
     }
-    if calc.abs(position(first,nodes)-position(second,nodes)) > 1 {
-        shift = calc.pow(1.2,position(first,nodes)-position(second,nodes))
+        if calc.abs(position(first,nodes)-position(second,nodes)) > 1 {
+        shift = calc.pow(calc.abs(position(first,nodes)-position(second,nodes)),1.6)*0.4
     }
+    if calc.rem(position(first,nodes),2) == 1{
+        shift = -shift
+    }
+
+
+
     return linker(nodemaker(first,nodes,edges),nodemaker(second,nodes,edges),shift)
 
 }
@@ -54,5 +60,5 @@
 
 }
 
-#graph(("12","23","34","41","13","24"),(("12","23"),("23","34"),("34","41"),("41","12"),("13","12"),("13","23"),("13","34"),("34","41"),("24","12"),("24","23"),("24","34"),("24","41")))
+#graph(("12","23","34","41","13","24"),(("12","23"),("23","34"),("34","41"),("41","12"),("13","12"),("13","23"),("13","34"),("13","41"),("34","41"),("24","12"),("24","23"),("24","34"),("24","41")))
 
