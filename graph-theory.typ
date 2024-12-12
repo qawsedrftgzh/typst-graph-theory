@@ -29,7 +29,7 @@
         shift = -1
     }
     if calc.abs(position(first,nodes)-position(second,nodes)) > 1 {
-        shift = 1.5
+        shift = calc.pow(1.2,position(first,nodes)-position(second,nodes))
     }
     return linker(nodemaker(first,nodes,edges),nodemaker(second,nodes,edges),shift)
 
@@ -39,6 +39,7 @@
 #let graph(nodes,edges) = {
     cetz.canvas({
       import cetz.draw: *
+      //let nodepos = 
       for node in nodes {
         content(nodemaker(node,nodes,edges),[#node])
         circle(nodemaker(node,nodes,edges),radius:(0.5,0.4))
@@ -46,7 +47,7 @@
       let arrow_spacer = 0
       for (arrow) in edges {
         let (first,second) = arrow 
-        bezier(..arrowmaker(arrow,nodes,edges),mark:(end:">"))
+        bezier(..arrowmaker(arrow,nodes,edges))
 
              }
     })
