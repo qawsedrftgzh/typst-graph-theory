@@ -37,7 +37,7 @@
         shift = calc.pow(calc.abs(indexOfFirst - indexOfSecond), 1.6)*0.4
     }
 
-    if calc.rem(indexOfFirst, 2) == 1{
+    if calc.rem(indexOfFirst, 2) == 1 {
         shift = -shift
     }
 
@@ -45,18 +45,45 @@
 }
 
 
-#let graph(nodes, edges) = {
+/// If the passed argument is an array, this function does nothing.
+/// Otherwise you get an array with this item as the array’s only item.
+#let castToArray(item) = {
+    if type(item) == array {
+        item
+    } else {
+        (item, )
+    }
+}
+
+/// #arg[edges] is a dictionary, where each key is a name of a node
+/// and each value is a name of a connected node or an array of names of connected nodes.
+#let graph(edges) = {
+    let nodes = edges.keys()
+
     cetz.canvas({
         import cetz.draw: *
+
         for node in nodes {
             content(nodemaker(node, nodes, edges), [#node])
             circle(nodemaker(node, nodes, edges), radius:(0.5, 0.4))
         } 
-        for (arrow) in edges {
-            bezier(..arrowmaker(arrow, nodes, edges))
+
+        for (fromNode, toNodes) in edges.pairs() {
+            for toNode in castToArray(toNodes) {
+                bezier(..arrowmaker((fromNode, toNode), nodes, edges))
+            }
         }
     })
 }
 
-#graph(("12", "23", "34", "41", "13", "24"), (("12", "23"), ("23", "34"), ("34", "41"), ("41", "12"), ("13", "12"), ("13", "23"), ("13", "34"), ("13", "41"), ("34", "41"), ("24", "12"), ("24", "23"), ("24", "34"), ("24", "41"), ("12", "12")))
+#graph(
+    (
+        "12": ("12", "23"),
+        "23": ("34"),
+        "34": ("41"),
+        "41": ("12"),
+        "13": ("12", "23", "34", "41"),
+        "24": ("12", "23", "34", "41"),
+    )
+)
 
