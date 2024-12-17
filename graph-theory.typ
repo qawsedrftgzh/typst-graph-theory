@@ -58,7 +58,8 @@
         let defaultNodeStyle = mergeDictionaries((
             fill: white,
             stroke: black,
-            text: black
+            text: black,
+            radius: 0.5
         ), styles.at("node", default: (:)))
 
         for node in nodes {
@@ -66,7 +67,7 @@
 
             circle(
                 nodemaker(node, nodes, edges), 
-                radius: (0.5, 0.4),
+                radius: style.radius,
                 fill: style.fill,
                 stroke: style.stroke
             )
