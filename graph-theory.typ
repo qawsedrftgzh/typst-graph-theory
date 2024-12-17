@@ -1,4 +1,5 @@
 #import "@preview/cetz:0.3.1" 
+#import "./sources/utilities.typ": castToArray, mergeDictionaries
 
 #let nodemaker(thing, nodes, edges) = {
     let node_index = nodes.position(item => item == thing)
@@ -44,28 +45,36 @@
     return linker(nodemaker(first, nodes, edges), nodemaker(second, nodes, edges), shift)
 }
 
-
-/// If the passed argument is an array, this function does nothing.
-/// Otherwise you get an array with this item as the array’s only item.
-#let castToArray(item) = {
-    if type(item) == array {
-        item
-    } else {
-        (item, )
-    }
-}
-
 /// #arg[edges] is a dictionary, where each key is a name of a node
 /// and each value is a name of a connected node or an array of names of connected nodes.
-#let graph(edges) = {
+///
+/// #args [styles] describes the way nodes and/or edges should be displayed.
+#let graph(edges, styles: ()) = {
     let nodes = edges.keys()
 
     cetz.canvas({
         import cetz.draw: *
 
+        let defaultNodeStyle = mergeDictionaries((
+            fill: white,
+            stroke: black,
+            text: black
+        ), styles.at("node", default: (:)))
+
         for node in nodes {
-            content(nodemaker(node, nodes, edges), [#node])
-            circle(nodemaker(node, nodes, edges), radius:(0.5, 0.4))
+            let style = mergeDictionaries(defaultNodeStyle, styles.at(node, default: (:)))
+
+            circle(
+                nodemaker(node, nodes, edges), 
+                radius: (0.5, 0.4),
+                fill: style.fill,
+                stroke: style.stroke
+            )
+
+            content(
+                nodemaker(node, nodes, edges), 
+                text(fill: style.text)[#node]
+            )
         } 
 
         for (fromNode, toNodes) in edges.pairs() {
@@ -84,6 +93,13 @@
         "41": ("12"),
         "13": ("12", "23", "34", "41"),
         "24": ("12", "23", "34", "41"),
-    )
+    ),
+    styles: (
+        "12": (
+            fill: yellow,
+            stroke: red,
+            text: orange
+        )
+    ),
 )
 
