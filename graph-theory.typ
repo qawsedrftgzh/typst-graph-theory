@@ -1,6 +1,6 @@
 #import "@preview/cetz:0.3.1" 
 #import "layout.typ":*
-#import "./sources/utilities.typ": castToArray, mergeDictionaries
+#import "utilities.typ": castToArray, mergeDictionaries
 
 
 
