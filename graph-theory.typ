@@ -1,4 +1,4 @@
-#import "@preview/cetz:0.3.1" 
+#import "@preview/cetz:0.3.1"
 #import "layout.typ":*
 #import "utilities.typ": castToArray, mergeDictionaries
 
@@ -8,7 +8,7 @@
 /// and each value is a name of a connected node or an array of names of connected nodes.
 ///
 /// #args [styles] describes the way nodes and/or edges should be displayed.
-#let graph(edges, styles: ()) = {
+#let graph(edges, styles: (),layout:()) = {
     let nodes = edges.keys()
 
     cetz.canvas({
@@ -28,12 +28,12 @@
         for (fromNode, toNodes) in edges.pairs() {
             for toNode in castToArray(toNodes) {
                 let style = mergeDictionaries(
-                    defaultEdgeStyle, 
+                    defaultEdgeStyle,
                     styles.at(fromNode + "-" + toNode, default: (:))
                 )
 
                 set-style(stroke: style.stroke)
-                bezier(..arrowmaker((fromNode, toNode), nodes, edges))
+                bezier(..arrowmaker((fromNode, toNode), nodes, edges, layout))
             }
         }
 
@@ -41,36 +41,34 @@
             let style = mergeDictionaries(defaultNodeStyle, styles.at(node, default: (:)))
 
             circle(
-                nodemaker(node, nodes, edges), 
+                nodemaker(node, nodes, edges, layout),
                 radius: style.radius,
                 fill: style.fill,
                 stroke: style.stroke
             )
 
             content(
-                nodemaker(node, nodes, edges), 
+                nodemaker(node, nodes, edges, layout),
                 text(fill: style.text)[#node]
             )
-        } 
+        }
     })
 }
 
 #graph(
     (
-        "12": ("12", "23"),
-        "23": ("34"),
-        "34": ("41"),
-        "41": ("12"),
-        "13": ("12", "23", "34", "41"),
-        "24": ("12", "23", "34", "41"),
+        "a": ("a", "b","c"),
+        "b": ("c"),
+        "c": ("d"),
+		"d": ("a"),
     ),
     styles: (
-        "12": (
+        "a": (
             fill: yellow,
             stroke: red,
             text: orange
         ),
-        "12-23": (
+        "a-b": (
             stroke: red
         ),
         node: (
@@ -81,5 +79,9 @@
             stroke: green
         )
     ),
+	layout: (
+		style:"smart",
+		spacing:3,
+	),
 )
 

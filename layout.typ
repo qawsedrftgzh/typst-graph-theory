@@ -1,11 +1,12 @@
-#let nodemaker(thing, nodes, edges) = {
-    let layout = (style:"grid",columns:2,spacing:3)
+#import "utilities.typ": mergeDictionaries,castToArray
+#let nodemaker(thing, nodes, edges,layout) = {
+    let layout = mergeDictionaries((style:"circ",columns:2,spacing:3),layout)
     let nodeIndex = nodes.position(item => item == thing)
     let nodeNumber = nodes.len()
-    
+
     if (layout.style == "circ"){
         return (
-            calc.cos(nodeIndex/nodeNumber*6.28)*layout.spacing, 
+            calc.cos(nodeIndex/nodeNumber*6.28)*layout.spacing,
             calc.sin(nodeIndex/nodeNumber*6.28)*layout.spacing
         )
 
@@ -14,9 +15,25 @@
             calc.rem(nodeIndex,layout.columns)*layout.spacing,
             calc.floor(nodeIndex/layout.columns)*layout.spacing
         )
-    }else{
+    }else if (layout.style == "smart"){
+		let grade = (:)
+		for node in nodes{
+			grade.insert(node,0)
+		}
+		for edges in edges{
+			let (first,conections)=edges
+			for second in castToArray(conections){
+				if (second != first){
+					grade.insert(first,grade.at(first)+1)
+					grade.insert(second,grade.at(second)+1)
+				}
+
+			}
+		}
+		return (grade.at(thing),nodeIndex*1)
+	}else{
         return (
-            nodeIndex*layout.spacing, 
+            nodeIndex*layout.spacing,
             0
         )
     }
@@ -40,9 +57,9 @@
     }
 }
 
-#let arrowmaker(arrow, nodes, edges) = {
+#let arrowmaker(arrow, nodes, edges,layout) = {
     let (first, second) = arrow
-    let shift = 0 
+    let shift = 0
 
     if first == second {
         shift = -1
@@ -51,8 +68,8 @@
     let indexOfFirst = nodes.position(item => item == first)
     let indexOfSecond = nodes.position(item => item == second)
 
-    
-    return linker(nodemaker(first, nodes, edges), nodemaker(second, nodes, edges), shift)
+
+    return linker(nodemaker(first, nodes, edges,layout), nodemaker(second, nodes, edges,layout), shift)
 }
 
 
