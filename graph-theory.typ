@@ -14,6 +14,10 @@
     cetz.canvas({
         import cetz.draw: *
 
+        let defaultEdgeStyle = mergeDictionaries((
+            stroke: black
+        ), styles.at("edge", default: (:)))
+
         let defaultNodeStyle = mergeDictionaries((
             fill: white,
             stroke: black,
@@ -23,10 +27,15 @@
 
         for (fromNode, toNodes) in edges.pairs() {
             for toNode in castToArray(toNodes) {
+                let style = mergeDictionaries(
+                    defaultEdgeStyle, 
+                    styles.at(fromNode + "-" + toNode, default: (:))
+                )
+
+                set-style(stroke: style.stroke)
                 bezier(..arrowmaker((fromNode, toNode), nodes, edges))
             }
         }
-
 
         for node in nodes {
             let style = mergeDictionaries(defaultNodeStyle, styles.at(node, default: (:)))
@@ -60,6 +69,16 @@
             fill: yellow,
             stroke: red,
             text: orange
+        ),
+        "12-23": (
+            stroke: red
+        ),
+        node: (
+            fill: aqua,
+            text: white
+        ),
+        edge: (
+            stroke: green
         )
     ),
 )
