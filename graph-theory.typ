@@ -25,7 +25,7 @@
             radius: 0.5
         ), styles.at("node", default: (:)))
 
-        for (fromNode, toNodes) in edges.pairs() {
+		for (fromNode, toNodes) in edges.pairs() {
             for toNode in castToArray(toNodes) {
                 let style = mergeDictionaries(
                     defaultEdgeStyle,
@@ -36,6 +36,7 @@
                 bezier(..arrowmaker((fromNode, toNode), nodes, edges, layout))
             }
         }
+
 
         for node in nodes {
             let style = mergeDictionaries(defaultNodeStyle, styles.at(node, default: (:)))
@@ -57,10 +58,11 @@
 
 #graph(
     (
-        "a": ("a", "b","c"),
-        "b": ("c"),
+        "a": ("a", "b"),
+        "b": ("c","d"),
         "c": ("d"),
 		"d": ("a"),
+		"e": ("a"),
     ),
     styles: (
         "a": (
