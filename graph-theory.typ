@@ -9,7 +9,6 @@
 ///
 /// #args [styles] describes the way nodes and/or edges should be displayed.
 #let graph(edges, styles: (),layout:()) = {
-	context {
     let nodes = edges.keys()
 	let nodesPos = generateNodes(nodes,edges,layout)
 
@@ -58,7 +57,6 @@
             )
         }
     })
-	}
 }
 
 #graph(
@@ -91,6 +89,3 @@
 		spacing:3,
 	),
 )
-
-
-
