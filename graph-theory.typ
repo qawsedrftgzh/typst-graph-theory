@@ -8,7 +8,7 @@
 /// and each value is a name of a connected node or an array of names of connected nodes.
 ///
 /// #args [styles] describes the way nodes and/or edges should be displayed.
-#let graph(edges, styles: (),layout:()) = {
+#let graph(edges, styles: (:), layout:(:)) = {
     let nodes = edges.keys()
 	let nodesPos = generateNodes(nodes,edges,layout)
 
@@ -36,10 +36,8 @@
                 set-style(stroke: style.stroke)
                 bezier(..arrowmaker((fromNode, toNode), nodesPos, edges, layout))
 				content(arrowmaker((fromNode,toNode),nodesPos,edges,layout).at(2))[test]
-
             }
         }
-
 
         for node in nodes {
             let style = mergeDictionaries(defaultNodeStyle, styles.at(node, default: (:)))
