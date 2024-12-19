@@ -36,6 +36,8 @@
 
                 set-style(stroke: style.stroke)
                 bezier(..arrowmaker((fromNode, toNode), nodesPos, edges, layout))
+				content(arrowmaker((fromNode,toNode),nodesPos,edges,layout).at(2))[test]
+
             }
         }
 
@@ -85,8 +87,10 @@
         )
     ),
 	layout: (
-		style:"smart",
+		style:"circ",
 		spacing:3,
 	),
 )
+
+
 
