@@ -82,6 +82,10 @@
             stroke: green
         )
     ),
-	//layout: circularLayout
-	layout: gridLayout
+	layout: customLayout.with(positions: (..) => (
+		a: (1, 2),
+		c: (3,2),
+		rest: (rel: (2, -2))
+	))
+	//layout: gridLayout.with(spacing: 5)
 )

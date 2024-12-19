@@ -1,5 +1,48 @@
 #import "utilities.typ": mergeDictionaries,castToArray
 
+#let customLayout(nodes, edges, positions: () => (:)) = {
+	let nodeDict = (:)
+
+	if type(positions) == function {
+		nodeDict = positions()
+	} else if type(positions) == dictionary {
+		nodeDict = positions
+	}
+
+	if "rest" in nodeDict and not ("rest" in nodes) {
+		for node in nodes {
+			if node in nodeDict {
+				continue
+			}
+
+			nodeDict.insert(node, nodeDict.rest)
+		}
+	}
+
+	return ((), ..nodeDict.pairs())
+		.reduce((result, (node, value)) => {
+			if node == "rest" and not ("rest" in nodes) {
+				return result
+			}
+
+			if "rel" in value {
+				let lastX = 0
+				let lastY = 0
+
+				if result.len() > 0 {
+					let (_, lastValue) = result.last()
+					(lastX, lastY) = lastValue
+				}
+
+				let (x, y) = value.rel
+				value = (lastX + x, lastY + y)
+			}
+
+			return (..result, (node, value))
+		})
+		.to-dict()
+}
+
 #let linearLayout(nodes, edges, spacing: 3)={
 	let i = 0
 	let nodeDict = (:)
@@ -33,11 +76,10 @@
 
 	for node in nodes{
     	let nodeIndex = nodes.position(item => item == node)
-		 nodeDict.insert(node,(
+		nodeDict.insert(node,(
         	calc.rem(nodeIndex,columns) * spacing,
         	calc.floor(nodeIndex/columns) * spacing
     	))
-
 	}
 
 	return nodeDict
@@ -52,7 +94,6 @@
 	for node in nodes{
 		grade.insert(node,0)
 	}
-
 
 	while (nodeDict.len() < grade.len()){
 		for edge in edges{
@@ -98,7 +139,6 @@
 	let curve = 1
 	let nodes = nodesPos.keys()
     let (first, second) = arrow
-
 
 	let (x1,y1) = getNode(first,nodesPos)
 	let (x2,y2) = getNode(second,nodesPos)
