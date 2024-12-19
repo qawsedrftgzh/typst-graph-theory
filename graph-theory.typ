@@ -9,12 +9,14 @@
 ///
 /// #args [styles] describes the way nodes and/or edges should be displayed.
 #let graph(edges, styles: (),layout:()) = {
+	context {
     let nodes = edges.keys()
+	let nodesPos = generateNodes(nodes,edges,layout)
 
     cetz.canvas({
         import cetz.draw: *
 
-        let defaultEdgeStyle = mergeDictionaries((
+		let defaultEdgeStyle = mergeDictionaries((
             stroke: black
         ), styles.at("edge", default: (:)))
 
@@ -33,7 +35,7 @@
                 )
 
                 set-style(stroke: style.stroke)
-                bezier(..arrowmaker((fromNode, toNode), nodes, edges, layout))
+                bezier(..arrowmaker((fromNode, toNode), nodesPos, edges, layout))
             }
         }
 
@@ -42,18 +44,19 @@
             let style = mergeDictionaries(defaultNodeStyle, styles.at(node, default: (:)))
 
             circle(
-                nodemaker(node, nodes, edges, layout),
+                getNode(node, nodesPos),
                 radius: style.radius,
                 fill: style.fill,
                 stroke: style.stroke
             )
 
             content(
-                nodemaker(node, nodes, edges, layout),
+                getNode(node, nodesPos),
                 text(fill: style.text)[#node]
             )
         }
     })
+	}
 }
 
 #graph(

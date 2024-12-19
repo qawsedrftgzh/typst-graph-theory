@@ -1,41 +1,51 @@
 #import "utilities.typ": mergeDictionaries,castToArray
 
-#let linearLayout(thing, nodes, edges, layout)={
-	let layout = mergeDictionaries((style:"circ",columns:2,spacing:3),layout)
-    let nodeIndex = nodes.position(item => item == thing)
-    let nodeNumber = nodes.len()
-
-	return (
-		nodeIndex*layout.spacing,
-		0
-	)
+#let linearLayout(nodes, edges, layout)={
+	let layout = mergeDictionaries((spacing:3),layout)
+	let i = 0
+	let nodeDict = (:)
+	for node in nodes{
+		nodeDict.insert(node,(i*layout.spacing,0))
+		i += 1
+	}
+	return nodeDict
 }
 
-#let circularLayout(thing,nodes,edges,layout)={
+
+#let circularLayout(nodes,edges,layout)={
 	let layout = mergeDictionaries((style:"circ",spacing:3,offset:45deg),layout)
-    let nodeIndex = nodes.position(item => item == thing)
     let nodeNumber = nodes.len()
+	let nodeDict = (:)
 
-	return (
-        calc.cos(nodeIndex/nodeNumber*6.28+layout.offset.rad())*layout.spacing,
-        calc.sin(nodeIndex/nodeNumber*6.28+layout.offset.rad())*layout.spacing
-    )
+	for node in nodes {
+    	let nodeIndex = nodes.position(item => item == node)
+		nodeDict.insert(node,(
+			calc.cos(nodeIndex/nodeNumber*6.28+layout.offset.rad())*layout.spacing,
+			calc.sin(nodeIndex/nodeNumber*6.28+layout.offset.rad())*layout.spacing
+		))
+	}
+	return nodeDict
 }
 
-#let gridLayout(thing,nodes,edges,layout)={
+#let gridLayout(nodes,edges,layout)={
 	let layout = mergeDictionaries((style:"circ",columns:2,spacing:3),layout)
-    let nodeIndex = nodes.position(item => item == thing)
     let nodeNumber = nodes.len()
+	let nodeDict = (:)
 
-	return (
-        calc.rem(nodeIndex,layout.columns)*layout.spacing,
-        calc.floor(nodeIndex/layout.columns)*layout.spacing
-    )
+	for node in nodes{
+    	let nodeIndex = nodes.position(item => item == node)
+		 nodeDict.insert(node,(
+        	calc.rem(nodeIndex,layout.columns)*layout.spacing,
+        	calc.floor(nodeIndex/layout.columns)*layout.spacing
+    	))
+
+	}
+
+	return nodeDict
 }
 
-#let smartLayout(thing, nodes, edges, layout)={
+#let smartLayout(nodes, edges, layout)={
 	let layout = mergeDictionaries((style:"circ",columns:2,spacing:3),layout)
-    let nodeIndex = nodes.position(item => item == thing)
     let nodeNumber = nodes.len()
 
 	let grade = (:)
@@ -59,37 +69,43 @@
 		}
 	}
 	if (maxGrade <= 2){
-		return linearLayout(thing, nodes, edges, layout)
+		return linearLayout(nodes, edges, layout)
 	}else if (maxGrade <= 3){
-		return circularLayout(thing, nodes, edges, layout)
+		return circularLayout(nodes, edges, layout)
 	}else{
 		return (grade.at(thing),nodeIndex*1)
 	}
 
 }
 
-#let nodemaker(thing, nodes, edges,layout) = {
+#let generateNodes(nodes, edges, layout) = {
     if (layout.style == "circ"){
-        circularLayout(thing,nodes,edges,layout)
+        circularLayout(nodes, edges, layout)
     } else if (layout.style == "grid"){
-		gridLayout(thing,nodes,edges,layout)
+		gridLayout(nodes, edges, layout)
     }else if (layout.style == "linear"){
-		linearLayout(thing, nodes, edges, layout)
+		linearLayout(nodes, edges, layout)
 	}else{
-        smartLayout(thing,nodes,edges,layout)
+        smartLayout(nodes, edges, layout)
 	}
+}
+
+#let getNode(node,nodes) = {
+	[nodes]
+	return nodes.at(node)
 }
 
 
 
 
-
-#let arrowmaker(arrow, nodes, edges,layout) = {
+#let arrowmaker(arrow, nodesPos, edges,layout) = {
+	let nodes = nodesPos.keys()
 	let layout = mergeDictionaries((style:"circ",spacing:3,offset:45deg,curve:1),layout)
     let (first, second) = arrow
 
-	let (x1,y1) = nodemaker(first,nodes,edges,layout)
-	let (x2,y2) = nodemaker(second, nodes, edges, layout)
+
+	let (x1,y1) = getNode(first,nodesPos)
+	let (x2,y2) = getNode(second,nodesPos)
 
 	let firstPos = nodes.position(item => item == first)
 	let secondPos = nodes.position(item => item == second)
